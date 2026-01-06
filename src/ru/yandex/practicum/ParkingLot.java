@@ -20,11 +20,23 @@ public class ParkingLot extends AbstractParkingLot {
     public ParkingLot(int totalSpots, int electricSpots, int premiumSpots) {
         super(totalSpots, electricSpots, premiumSpots);
 
-        int normalSpots = totalSpots - electricSpots - premiumSpots;
+        // защита от отрицательных входных данных
+        int total = Math.max(0, totalSpots);
+        int electric = Math.max(0, electricSpots);
+        int premium = Math.max(0, premiumSpots);
 
-        if (normalSpots < 0) {
-            normalSpots = 0;
+        // Электро не может быть больше total
+        if (electric > total) {
+            electric = total;
         }
+
+        // Премиум не может быть больше того, что осталось после электро
+        if (premium > total - electric) {
+            premium = total - electric;
+        }
+
+        // 3) остаток — обычные
+        int normalSpots = total - electric - premium;
 
         int id = 1;
 
@@ -34,14 +46,15 @@ public class ParkingLot extends AbstractParkingLot {
         }
 
         // Места для электромобилей
-        for (int i = 0; i < electricSpots; i++) {
+        for (int i = 0; i < electric; i++) {
             spots.add(new ParkingSpot(id++, SpotType.ELECTRIC));
         }
 
         // Премиум-места
-        for (int i = 0; i < premiumSpots; i++) {
+        for (int i = 0; i < premium; i++) {
             spots.add(new ParkingSpot(id++, SpotType.PREMIUM));
         }
+
     }
 
     @Override
@@ -139,12 +152,16 @@ public class ParkingLot extends AbstractParkingLot {
         }
         String normalized = carType.trim().toUpperCase();
 
-        return switch (normalized) {
-            case "NORMAL" -> CarType.NORMAL;
-            case "ELECTRIC" -> CarType.ELECTRIC;
-            case "PREMIUM" -> CarType.PREMIUM;
-            default -> throw new ParkingException("Unknown car type: " + carType);
-        };
+        switch (normalized) {
+            case "NORMAL":
+                return CarType.NORMAL;
+            case "ELECTRIC":
+                return CarType.ELECTRIC;
+            case "PREMIUM":
+                return CarType.PREMIUM;
+            default:
+                throw new ParkingException("Unknown car type: " + carType);
+        }
 
     }
 
