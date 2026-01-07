@@ -7,7 +7,13 @@ public class Car {
     private final CarType type;
 
     public Car(String number, CarType type) {
-        this.number = number;
+        if (number == null || number.trim().isEmpty()) {
+            throw new IllegalArgumentException("Number must not be null or empty");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("Type must not be null");
+        }
+        this.number = number.trim();
         this.type = type;
     }
 

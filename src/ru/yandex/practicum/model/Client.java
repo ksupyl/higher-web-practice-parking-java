@@ -7,8 +7,14 @@ public final class Client {
     private final Car car;
 
     public Client(String id, Car car) {
-        this.id = Objects.requireNonNull(id, "id must not be null").trim();
-        this.car = Objects.requireNonNull(car, "car must not be null");
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("id must not be null or empty");
+        }
+        if (car == null) {
+            throw new IllegalArgumentException("car must not be null");
+        }
+        this.id = id.trim();
+        this.car = car;
     }
 
     public String getId() {

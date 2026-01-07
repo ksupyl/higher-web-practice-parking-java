@@ -7,6 +7,12 @@ public class ParkingSpot {
     private Car parkedCar;
 
     public ParkingSpot(int id, SpotType type) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("id must be positive");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("type must not be null");
+        }
         this.id = id;
         this.type = type;
     }
