@@ -91,11 +91,10 @@ public class ParkingLot extends AbstractParkingLot {
             // Фиксируем место за номером машины
             occupiedByNumber.put(normalizedNumber, spot);
 
-        } catch (ParkingException e) {
-            // Обработка ожидаемых ошибок
-            throw e;
         } catch (Exception e) {
-            // Обработка любой неожиданной ошибки
+            if (e instanceof ParkingException) {
+                throw (ParkingException) e;
+            }
             throw new ParkingException("Error while processing ENTER: " + e.getMessage());
         }
     }
@@ -118,11 +117,10 @@ public class ParkingLot extends AbstractParkingLot {
             // Удаляем информацию о машине и её месте
             occupiedByNumber.remove(normalizedNumber);
 
-        } catch (ParkingException e) {
-            // Обработка ожидаемых ошибок
-            throw e;
         } catch (Exception e) {
-            // Обработка любой неожиданной ошибки
+            if (e instanceof ParkingException) {
+                throw (ParkingException) e;
+            }
             throw new ParkingException("Error while processing LEAVE: " + e.getMessage());
         }
     }
@@ -132,26 +130,32 @@ public class ParkingLot extends AbstractParkingLot {
         return new HashSet<>(occupiedByNumber.keySet());
     }
 
-    // Проверка на пустую или null строку
+    // Проверка на пустую строку
     private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+        return s.strip().isEmpty();
     }
 
     // Нормализация номера машины
     private static String normalizeNumber(String number) throws ParkingException {
+        if (number == null) {
+            throw new ParkingException("Car number is null");
+        }
         if (isBlank(number)) {
             throw new ParkingException("Car number is empty");
         }
-        return number.trim();
+        return number.strip();
     }
 
     // Перевод строки в тип машины
     private static CarType parseCarType(String carType) throws ParkingException {
+        if (carType == null) {
+            throw new ParkingException("Car type is null");
+        }
         if (isBlank(carType)) {
             throw new ParkingException("Car type is empty");
         }
-        String normalized = carType.trim().toUpperCase();
 
+        String normalized = carType.strip().toUpperCase();
         switch (normalized) {
             case "NORMAL":
                 return CarType.NORMAL;
@@ -162,7 +166,6 @@ public class ParkingLot extends AbstractParkingLot {
             default:
                 throw new ParkingException("Unknown car type: " + carType);
         }
-
     }
 
     // Поиск первого свободного места нужного типа
